@@ -1,5 +1,5 @@
 import json
-from app.widgets.base import BaseWidget
+from webGui.widgets.base import BaseWidget
 
 class Horizontal(BaseWidget):
     """A layout container that aligns its children horizontally using Flexbox."""

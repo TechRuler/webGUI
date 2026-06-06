@@ -1,16 +1,18 @@
 import json
-from app.widgets.base import BaseWidget
+from webGui.widgets.base import BaseWidget
 
 
-class Grid(BaseWidget):
-    """A highly dynamic layout container using CSS Grid."""
-    def __init__(self, children=None, columns="repeat(3, 1fr)", gap="15px", style=None):
+class Vertical(BaseWidget):
+    """A layout container that aligns its children vertically using Flexbox."""
+    def __init__(self, children=None, alignment="flex-start", gap="10px", style=None):
         self.children = children if children else []
-        super().__init__(prefix="grid")
+        super().__init__(prefix="col")
         
         default_style = {
-            "display": "grid",
-            "gridTemplateColumns": columns, # e.g., 'repeat(3, 1fr)' or '200px 1fr'
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "flex-start",
+            "alignItems": alignment, # e.g., 'center', 'stretch'
             "gap": gap,
             "width": "100%",
             "boxSizing": "border-box"
@@ -31,10 +33,10 @@ class Grid(BaseWidget):
 
         js_script = f"""
         (function() {{
-            let gridDiv = document.createElement('div');
-            gridDiv.id = '{self.id}';
-            Object.assign(gridDiv.style, {json.dumps(self.style)});
-            document.getElementById('{parent_target}').appendChild(gridDiv);
+            let colDiv = document.createElement('div');
+            colDiv.id = '{self.id}';
+            Object.assign(colDiv.style, {json.dumps(self.style)});
+            document.getElementById('{parent_target}').appendChild(colDiv);
         }})();
         """
         window.evaluate_js(js_script)

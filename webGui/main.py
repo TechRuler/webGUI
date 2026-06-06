@@ -1,7 +1,7 @@
-# app/main.py
+
 import webview 
-from app.config import state, settings
-from app.config.state import EVENT_REGISTRY
+from webGui.config import state, settings
+from webGui.config.state import EVENT_REGISTRY
 
 class App:
     def __init__(self, title="App", width=800, height=60):

@@ -1,6 +1,6 @@
-# app/widgets/button.py
+
 import json
-from app.widgets.base import BaseWidget
+from webGui.widgets.base import BaseWidget
 
 class Button(BaseWidget):
     def __init__(self, text="Button", bg_color=None, on_click=None, style=None):

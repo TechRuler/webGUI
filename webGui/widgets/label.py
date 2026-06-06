@@ -1,6 +1,6 @@
-# app/widgets/label.py
+
 import json
-from app.widgets.base import BaseWidget
+from webGui.widgets.base import BaseWidget
 
 class Label(BaseWidget):
     def __init__(self, text="Static Text", style=None):

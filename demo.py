@@ -66,11 +66,11 @@
 # app.add(master_stack)
 # app.run()
 
-from app.main import App
-from app.widgets.button import Button
-from app.widgets.label import Label
-# from app.widgets.layout import Horizontal, Vertical
-from app.layout import Horizontal, Vertical
+from webGui import App
+from webGui.widgets.button import Button
+from webGui.widgets.label import Label
+# from webGui.widgets.layout import Horizontal, Vertical
+from webGui.layout import Horizontal, Vertical
 
 # 1. Initialize our main app canvas framework
 app = App(title="Dynamic Theme Switcher", width=600, height=300)

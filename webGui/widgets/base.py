@@ -1,6 +1,6 @@
-# app/widgets/base.py
+
 import uuid
-from app.config import state
+from webGui.config import state
 
 class BaseWidget:
     def __init__(self, prefix="widget", on_event=None, event_suffix="action", className=""):

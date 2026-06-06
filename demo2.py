@@ -1,6 +1,6 @@
-from app.main import App
-from app.widgets.animation import Animation
-from app.widgets import Button
+from webGui import App
+from webGui.widgets.animation import Animation
+from webGui.widgets import Button
 root = App(title="App", width=800, height=600)
 
 fade = Animation(

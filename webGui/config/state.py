@@ -5,3 +5,5 @@ EVENT_REGISTRY = {}
 
 # Holds the live pywebview window instance once running
 ACTIVE_WINDOW = None
+
+_PENDING_JS = []

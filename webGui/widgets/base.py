@@ -1,13 +1,16 @@
 
 import uuid
 from webGui.config import state
+import json
 
 class BaseWidget:
-    def __init__(self, prefix="widget", on_event=None, event_suffix="action", className=""):
+    def __init__(self, prefix="widget", on_event=None, event_suffix="action", class_name="", style=None, default_style=None, **kwargs):
         # 1. Automatically generate a clean, unique ID for every single widget
         self.id = f"{prefix}_{uuid.uuid4().hex[:8]}"
         self.app = None
-        self.className = className
+        self.class_name = class_name
+
+        self.style = self.clean_style(style, kwargs, default_style)
         
         # Default target parent is the main canvas root
         self._target_parent_id = "root"
@@ -33,11 +36,40 @@ class BaseWidget:
 
     def update_style(self, property_name, value):
         """A universal method allowing users to change ANY CSS property on the fly!"""
+        self.style[property_name] = value
         window = self.get_window()
         if window:
             # e.g., document.getElementById('btn_123').style.backgroundColor = 'red';
             js_update = f"document.getElementById('{self.id}').style.{property_name} = '{value}';"
             window.evaluate_js(js_update)
+            
+    
+    def get_config(self, property_name):
+        """
+        Safe getter for:
+        - public props (text, class_name, etc.)
+        - style props (backgroundColor, padding, etc.)
+        """
+
+        # 1. SAFE whitelist of direct props
+        direct_props = {
+            "id": self.id,
+            "class_name": self.class_name,
+        }
+
+        if property_name in direct_props:
+            return direct_props[property_name]
+
+        # 2. widget-defined attributes (SAFE ONLY)
+        if hasattr(self, property_name) and not property_name.startswith("_"):
+            return getattr(self, property_name)
+
+        # 3. style lookup
+        if hasattr(self, "style") and property_name in self.style:
+            return self.style[property_name]
+
+        
+        return None
 
     def render_inside(self, parent_id):
         """
@@ -51,10 +83,77 @@ class BaseWidget:
         self._target_parent_id = "root" # Reset fallback
     
     def get_class_name(self):
-        return self.className
+        return self.class_name
     
     def get_id(self):
         return self.id
+    
+    def _normalize_styles(self, style):
+        if not style:
+            return {}
+
+        result = {}
+        for k, v in style.items():
+            parts = k.split("-")
+            camel = parts[0] + "".join(p.title() for p in parts[1:])
+            result[camel] = v
+        return result
+    
+    def _snake_to_camel(self, kwargs):
+        if not kwargs:
+                return {}
+        
+        result = {}
+
+        for k, v in kwargs.items():
+            parts = k.split("_")
+            camel = parts[0] + "".join(p.title() for p in parts[1:])
+            result[camel] = v
+        print("Converted kwargs to styles:", result)
+        return result
+    
+    def clean_style(self, style, kwargs, default_style=None):
+        style = self._normalize_styles(style or {})
+        kwargs_style = self._snake_to_camel(kwargs or {})
+
+        # merge both correctly
+        override = {**style, **kwargs_style}
+
+        if default_style is None:
+            default_style = {}
+        result = {**default_style, **override}
+
+
+        return result
+    
+    def register_event(self, event_type):
+        js = f"""
+        (function() {{
+            let el = document.getElementById({json.dumps(self.id)});
+            if (!el) return;
+
+            el.addEventListener({json.dumps(event_type)}, () => {{
+                if (window.pywebview?.api?.trigger_event) {{
+                    window.pywebview.api.trigger_event(
+                        {json.dumps(f"{self.id}_{event_type}")}
+                    );
+                }}
+            }});
+        }})();
+        """
+
+        state._PENDING_JS.append(js)
+    
+    def addEventListener(self, event_type, callback):
+        event_key = f"{self.id}_{event_type}"
+
+        state.EVENT_REGISTRY[event_key] = callback
+
+        # ONLY bind JS once
+        self.register_event(event_type)
+
+        return self
+    on = addEventListener # Alias for more intuitive syntax
 
     # 4. CONTEXT SCOPE HOOKS (Enables the 'with' statement for containers)
     def __enter__(self):

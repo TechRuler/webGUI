@@ -3,10 +3,7 @@ import json
 from webGui.widgets.base import BaseWidget
 
 class Label(BaseWidget):
-    def __init__(self, text="Static Text", style=None):
-        super().__init__(prefix="lbl")
-        self.text = text
-        
+    def __init__(self, text="Static Text", class_name="", style=None, **kwargs):
         # Framework baseline design for layout text blocks
         default_style = {
             "fontSize": "16px", 
@@ -14,9 +11,12 @@ class Label(BaseWidget):
             "fontFamily": "inherit"
         }
         
+        super().__init__(prefix="lbl", class_name=class_name, default_style=default_style, style=style, **kwargs)
+        self.text = text
+        
+        
         # Safe merge: filters and converts user kebab-case strings to camelCase automatically
-        # user_style = self._normalize_styles(style) if hasattr(self, '_normalize_styles') else (style or {})
-        self.style = {**default_style, **(style or {})}
+        # self.style = self.clean_style(style, kwargs, default_style)
 
     def render(self):
         window = self.get_window()
@@ -31,6 +31,12 @@ class Label(BaseWidget):
             lbl.id = '{self.id}';
             lbl.innerText = "{self.text}";
             Object.assign(lbl.style, {style_json});
+
+            const cls = '{self.class_name}';
+
+            if (cls && cls.trim()) {{
+                lbl.classList.add(...cls.trim().split(/\\s+/));
+            }}
             
             // DYNAMIC PARENT TARGETING
             let targetNode = document.getElementById('{parent_target}');

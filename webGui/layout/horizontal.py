@@ -1,13 +1,11 @@
 import json
 from webGui.widgets.base import BaseWidget
 
-class Horizontal(BaseWidget):
+class HorizontalDiv(BaseWidget):
     """A layout container that aligns its children horizontally using Flexbox."""
-    def __init__(self, children=None, alignment="flex-start", gap="10px", style=None):
+    def __init__(self, children=None, alignment="flex-start", gap="10px", class_name="", style=None, **kwargs):
         # Initialize children from array if given, else leave empty for 'with' contexts
         self.children = children if children else []
-        super().__init__(prefix="row")
-        
         default_style = {
             "display": "flex",
             "flexDirection": "row",
@@ -17,7 +15,14 @@ class Horizontal(BaseWidget):
             "width": "100%",
             "boxSizing": "border-box"
         }
-        self.style = {**default_style, **(style or {})}
+        super().__init__(prefix="row", class_name=class_name, default_style=default_style, style=style, **kwargs)
+
+        # self.style = self.clean_style(style, kwargs, default_style)
+
+        self.style["display"] = "flex" # Ensure flex display is always set
+        self.style["flexDirection"] = "row" # Ensure row direction is always set
+        self.style["justifyContent"] = self.style.get("justifyContent", alignment) # Ensure alignment is always set
+        self.style["gap"] = self.style.get("gap", gap) # Ensure gap is always set
 
     def add(self, widget):
         """Allows users to manually append pre-declared widgets into this container."""
@@ -37,6 +42,11 @@ class Horizontal(BaseWidget):
         (function() {{
             let rowDiv = document.createElement('div');
             rowDiv.id = '{self.id}';
+            const cls = '{self.class_name}';
+
+            if (cls && cls.trim()) {{
+                rowDiv.classList.add(...cls.trim().split(/\\s+/));
+            }}
             Object.assign(rowDiv.style, {json.dumps(self.style)});
             document.getElementById('{parent_target}').appendChild(rowDiv);
         }})();

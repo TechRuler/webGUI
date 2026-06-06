@@ -2,12 +2,10 @@ import json
 from webGui.widgets.base import BaseWidget
 
 
-class Grid(BaseWidget):
+class GridDiv(BaseWidget):
     """A highly dynamic layout container using CSS Grid."""
-    def __init__(self, children=None, columns="repeat(3, 1fr)", gap="15px", style=None):
+    def __init__(self, children=None, columns="repeat(3, 1fr)", gap="15px", style=None, **kwargs):
         self.children = children if children else []
-        super().__init__(prefix="grid")
-        
         default_style = {
             "display": "grid",
             "gridTemplateColumns": columns, # e.g., 'repeat(3, 1fr)' or '200px 1fr'
@@ -15,7 +13,15 @@ class Grid(BaseWidget):
             "width": "100%",
             "boxSizing": "border-box"
         }
-        self.style = {**default_style, **(style or {})}
+        super().__init__(prefix="grid", default_style=default_style, style=style, **kwargs)
+
+
+        # self.style = self.clean_style(style, kwargs, default_style)
+
+        self.style["display"] = "grid" # Ensure grid display is always set
+        self.style["gridTemplateColumns"] = self.style.get("gridTemplateColumns", columns) # Ensure columns are always set
+        self.style["gap"] = self.style.get("gap", gap) # Ensure gap is always set
+        
 
     def add(self, widget):
         """Allows users to manually append pre-declared widgets into this container."""
@@ -33,6 +39,11 @@ class Grid(BaseWidget):
         (function() {{
             let gridDiv = document.createElement('div');
             gridDiv.id = '{self.id}';
+            const cls = '{self.class_name}';
+
+            if (cls && cls.trim()) {{
+                gridDiv.classList.add(...cls.trim().split(/\\s+/));
+            }}
             Object.assign(gridDiv.style, {json.dumps(self.style)});
             document.getElementById('{parent_target}').appendChild(gridDiv);
         }})();

@@ -3,12 +3,8 @@ import json
 from webGui.widgets.base import BaseWidget
 
 class Button(BaseWidget):
-    def __init__(self, text="Button", bg_color=None, on_click=None, style=None):
+    def __init__(self, text="Button", bg_color=None, on_click=None, class_name="", style=None, **kwargs):
         # Pass prefix and event type to the base class
-        super().__init__(prefix="btn", on_event=on_click, event_suffix="click")
-        self.text = text
-
-        # Fallback to framework default color if bg_color is omitted
         button_bg = bg_color if bg_color else "#3498db"
 
         # Default button layout styles
@@ -19,15 +15,26 @@ class Button(BaseWidget):
             "border": "none",
             "borderRadius": "6px",
             "cursor": "pointer",
-            "width": "max-content",
+            "width": "max-content", 
             "fontSize": "16px",
             "transition": "filter 0.2s" # Enables smooth brightness transitions on hover
         }
+        super().__init__(
+            prefix="btn",
+            on_event=on_click, 
+            event_suffix="click", 
+            class_name=class_name,
+            default_style=default_style,
+            style=style,
+            **kwargs)
+        self.text = text
+
+        # Fallback to framework default color if bg_color is omitted
+        
         
         # Safe merge: converts user kebab-case strings to camelCase automatically
-        # user_style = self._normalize_styles(style) if hasattr(self, '_normalize_styles') else (style or {})
-        self.style = {**default_style, **(style or {})}
-
+        # self.style = self.clean_style(style, kwargs, default_style)
+       
     def render(self):
         window = self.get_window()
         if not window: return
@@ -39,8 +46,11 @@ class Button(BaseWidget):
         (function() {{
             let btn = document.createElement('button');
             btn.id = '{self.id}';
-            if ('{self.className}') {{
-                btn.className = '{self.className}';
+
+            const cls = '{self.class_name}';
+
+            if (cls && cls.trim()) {{
+                btn.classList.add(...cls.trim().split(/\\s+/));
             }}
 
             btn.innerText = "{self.text}";

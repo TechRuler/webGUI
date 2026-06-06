@@ -1,14 +1,15 @@
-# from app.main import App
-# from app.widgets.button import Button
-# from app.widgets.label import Label
-# from app.layout import Horizontal, Vertical, Grid
+# from webGui.layout.vertical import VerticalDiv
+# from webGui.main import App
+# from webGui.widgets.button import Button
+# from webGui.widgets.label import Label
+# from webGui.layout import HorizontalDiv, VerticalDiv, GridDiv
 
 # # 1. Initialize our main workspace canvas
 # app = App(title="Layout Engine: Axis Comparisons", width=950, height=650)
 
 # # 2. The Master Stacker (Vertical)
 # # This forces the top bar section to sit strictly above our grid section.
-# master_stack = Vertical(alignment="stretch", gap="35px")
+# master_stack = VerticalDiv(alignment="stretch", gap="35px")
 
 
 # # =====================================================================
@@ -16,10 +17,10 @@
 # # =====================================================================
 # # Notice how the buttons adapt strictly to their contents. They don't 
 # # care about matching sizes; they just line up neatly left-to-right.
-# top_navbar = Horizontal(alignment="space-between", style={"background": "#2c3e50", "padding": "15px"})
+# top_navbar = HorizontalDiv(alignment="space-between", style={"background": "#2c3e50", "padding": "15px"})
 
 # logo = Label("📊 System Matrix", style={"fontSize": "20px", "fontWeight": "bold", "color": "#ffffff"})
-# nav_actions = Horizontal(gap="12px")
+# nav_actions = HorizontalDiv(gap="12px")
 
 # btn_refresh = Button("Refresh Core", bg_color="#2980b9")
 # btn_logs = Button("View Historical Error Logs Database", bg_color="#34495e") # Long text expands naturally
@@ -35,7 +36,7 @@
 # # =====================================================================
 # # No matter how long or short the button texts are, this layout forcing 
 # # mechanism locks them into 3 perfectly matching geometric columns.
-# dashboard_grid = Grid(columns="repeat(3, 1fr)", gap="20px", style={"padding": "0 20px"})
+# dashboard_grid = GridDiv(columns="repeat(3, 1fr)", gap="20px", style={"padding": "0 20px"})
 
 # # Row 1 of Grid
 # card_a = Button("CPU Load: 42%", bg_color="#2ecc71", style={"height": "140px", "width": "100%", "fontSize": "18px"})
@@ -70,7 +71,7 @@ from webGui import App
 from webGui.widgets.button import Button
 from webGui.widgets.label import Label
 # from webGui.widgets.layout import Horizontal, Vertical
-from webGui.layout import Horizontal, Vertical
+from webGui.layout import HorizontalDiv, VerticalDiv
 
 # 1. Initialize our main app canvas framework
 app = App(title="Dynamic Theme Switcher", width=600, height=300)
@@ -96,10 +97,11 @@ def apply_matrix_mode():
 # =====================================================================
 # LAYOUT STRUCTURAL ASSEMBLY
 # =====================================================================
-master_stack = Vertical(alignment="center", gap="25px", style={"padding": "30px"})
+master_stack = VerticalDiv(alignment="center", gap="25px", padding="30px")
 
 title_text = Label("Select an Application Theme Profile Below", style={"fontSize": "20px", "fontWeight": "bold"})
-theme_bar = Horizontal(gap="15px")
+theme_bar = HorizontalDiv(gap="15px", backgroundColor="#dcdde1", padding="20px", borderRadius="8px")
+
 
 # Instantiate control buttons
 btn_dark = Button("Go Dark", bg_color="#2c3e50", on_click=apply_dark_mode)

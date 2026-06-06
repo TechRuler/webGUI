@@ -2,12 +2,10 @@ import json
 from webGui.widgets.base import BaseWidget
 
 
-class Vertical(BaseWidget):
+class VerticalDiv(BaseWidget):
     """A layout container that aligns its children vertically using Flexbox."""
-    def __init__(self, children=None, alignment="flex-start", gap="10px", style=None):
+    def __init__(self, children=None, alignment="flex-start", gap="10px", style=None, **kwargs):
         self.children = children if children else []
-        super().__init__(prefix="col")
-        
         default_style = {
             "display": "flex",
             "flexDirection": "column",
@@ -17,7 +15,15 @@ class Vertical(BaseWidget):
             "width": "100%",
             "boxSizing": "border-box"
         }
-        self.style = {**default_style, **(style or {})}
+        super().__init__(prefix="col", default_style=default_style, style=style, **kwargs)
+
+
+        # self.style = self.clean_style(style, kwargs, default_style)
+
+        self.style["display"] = "flex" # Ensure flex display is always set
+        self.style["flexDirection"] = "column" # Ensure column direction is always set
+        self.style["justifyContent"] = self.style.get("justifyContent", "flex-start") # Ensure alignment is always set
+        self.style["gap"] = self.style.get("gap", gap) # Ensure gap is always set
 
     def add(self, widget):
         """Allows users to manually append pre-declared widgets into this container."""
@@ -35,6 +41,11 @@ class Vertical(BaseWidget):
         (function() {{
             let colDiv = document.createElement('div');
             colDiv.id = '{self.id}';
+            const cls = '{self.class_name}';
+
+            if (cls && cls.trim()) {{
+                colDiv.classList.add(...cls.trim().split(/\\s+/));
+            }}
             Object.assign(colDiv.style, {json.dumps(self.style)});
             document.getElementById('{parent_target}').appendChild(colDiv);
         }})();

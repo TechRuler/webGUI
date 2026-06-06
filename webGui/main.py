@@ -1,7 +1,6 @@
 
 import webview 
 from webGui.config import state, settings
-from webGui.config.state import EVENT_REGISTRY
 
 class App:
     def __init__(self, title="App", width=800, height=60):
@@ -11,7 +10,6 @@ class App:
         self.width = width 
         self.height = height
 
-        self._pending_js = []   # 🔥 add this
         
     def add(self, component):
         self.components.append(component)
@@ -55,7 +53,7 @@ class App:
         if self.window:
             self.window.evaluate_js(js_script)
         else:
-            self._pending_js.append(js_script)
+            state._PENDING_JS.append(js_script)
 
     # =====================================================================
     # LIFECYCLE MANAGEMENT
@@ -68,12 +66,12 @@ class App:
         class JSBridge:
             def trigger_event(self, event_id, data=None):
                 """A universal event handler for every single widget."""
-                if event_id in EVENT_REGISTRY:
+                if event_id in state.EVENT_REGISTRY:
                     # If the widget sent data (like text or a slider value), pass it to Python
                     if data is not None:
-                        EVENT_REGISTRY[event_id](data)
+                        state.EVENT_REGISTRY[event_id](data)
                     else:
-                        EVENT_REGISTRY[event_id]() # Standard click with no data
+                        state.EVENT_REGISTRY[event_id]() # Standard click with no data
 
         self.window = webview.create_window(
             title=self.title,
@@ -98,7 +96,20 @@ class App:
             comp.render()
         
         # 🔥 execute queued JS
-        for js in self._pending_js:
+        # for js in self._pending_js:
+        #     self.window.evaluate_js(js)
+
+        # self._pending_js.clear()
+        for js in state._PENDING_JS:
             self.window.evaluate_js(js)
 
-        self._pending_js.clear()
+        state._PENDING_JS.clear()
+
+         # small delay ensures JS runtime is ready
+        self.window.evaluate_js("""
+            setTimeout(() => {
+                window.pywebviewReady = true;
+            }, 50);
+        """)
+
+       

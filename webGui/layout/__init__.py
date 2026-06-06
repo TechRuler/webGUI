@@ -1,3 +1,3 @@
-from .horizontal import Horizontal
-from .vertical import Vertical
-from .grid import Grid
+from .horizontal import HorizontalDiv
+from .vertical import VerticalDiv
+from .grid import GridDiv

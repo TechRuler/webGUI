@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="background-color: black;">
+    <div></div>
+    <input type="text">
+    <script>
+        const el = document.querySelector("input");
+        const dict = {}
+        for (let key in el) {
+            if (typeof el[key] !== "function") {
+                // console.log(key, el[key]);
+                dict[key] = el[key];
+            }
+        }
+        console.log(dict)
+    </script>
+</body>
+</html>

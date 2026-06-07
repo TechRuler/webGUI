@@ -24,7 +24,12 @@ class BaseWidget:
         # 3. Automatically handle event registration for any widget type
         if on_event:
             event_key = f"{self.id}_{event_suffix}"
-            state.EVENT_REGISTRY[event_key] = on_event
+            # state.EVENT_REGISTRY[event_key] = {
+            #     'data':{},
+            #     'callback':on_event
+            # }
+            state.EVENT_HANDLERS[event_key] = on_event
+            # state.EVENT_DATA[event_key] = {}
 
     def get_window(self):
         """Helper to safely fetch the active window from context or parent app."""
@@ -109,7 +114,6 @@ class BaseWidget:
             parts = k.split("_")
             camel = parts[0] + "".join(p.title() for p in parts[1:])
             result[camel] = v
-        print("Converted kwargs to styles:", result)
         return result
     
     def clean_style(self, style, kwargs, default_style=None):
@@ -133,8 +137,8 @@ class BaseWidget:
             if (!el) return;
 
             el.addEventListener({json.dumps(event_type)}, () => {{
-                if (window.pywebview?.api?.trigger_event) {{
-                    window.pywebview.api.trigger_event(
+                if (window.pywebview?.api?.trigger) {{
+                    window.pywebview.api.trigger(
                         {json.dumps(f"{self.id}_{event_type}")}
                     );
                 }}
@@ -147,13 +151,80 @@ class BaseWidget:
     def addEventListener(self, event_type, callback):
         event_key = f"{self.id}_{event_type}"
 
-        state.EVENT_REGISTRY[event_key] = callback
+        
+        state.EVENT_HANDLERS[event_key] = callback
 
         # ONLY bind JS once
         self.register_event(event_type)
 
         return self
     on = addEventListener # Alias for more intuitive syntax
+
+    def get_info_from_js(self, event_id, req_id):
+        window = self.get_window()
+        if not window:
+            return
+
+        js = f"""
+        (function(){{
+            const el = document.getElementById('{self.id}');
+            if (!el) return;
+
+            const cs = window.getComputedStyle(el);
+            const style = {{}};
+
+            for (let i = 0; i < cs.length; i++) {{
+                const p = cs[i];
+                const v = cs.getPropertyValue(p);
+                if (v) style[p] = v;
+            }}
+
+            const data = {{
+                req_id: "{req_id}",
+                tag: el.tagName.toLowerCase(),
+                value: ("value" in el) ? el.value : null,
+                class: Array.from(el.classList),
+                text: el.innerText,
+                html: el.innerHTML,
+                style: style
+            }};
+
+            window.pywebview.api.trigger('{event_id}', null, data);
+        }})();
+        """
+
+        window.evaluate_js(js)
+
+    # =========================================================
+    # GET INFO (SYNC WRAPPER OVER ASYNC BRIDGE)
+    # =========================================================
+    def get_info(self, prop):
+        req_id = uuid.uuid4().hex
+        event_id = f"{self.id}_get"
+
+        state._FUTURES[req_id] = {
+            "done": False,
+            "value": None
+        }
+
+        self.get_info_from_js(event_id, req_id)
+
+        # wait loop
+        for _ in range(50):
+            future = state._FUTURES.get(req_id)
+
+            if future and future["done"]:
+                data = future["value"]
+                if not data:
+                    return None
+
+                if prop in data:
+                    return data[prop]
+
+                if "style" in data and prop in data["style"]:
+                    return data["style"][prop]
+
+        return self.get_config(prop)
 
     # 4. CONTEXT SCOPE HOOKS (Enables the 'with' statement for containers)
     def __enter__(self):

@@ -61,7 +61,7 @@ class Button(BaseWidget):
             btn.onmouseout = () => btn.style.filter = "brightness(1)";
 
             btn.onclick = () => {{
-                window.pywebview.api.trigger_event('{self.id}_click');
+                window.pywebview.api.trigger('{self.id}_click');
             }};
 
             // DYNAMIC PARENT TARGETING

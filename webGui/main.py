@@ -1,5 +1,5 @@
 
-import webview 
+import webview, time
 from webGui.config import state, settings
 
 class App:
@@ -64,14 +64,58 @@ class App:
         
         # Create the JS API bridge so frontend clicks can talk to Python functions
         class JSBridge:
-            def trigger_event(self, event_id, data=None):
-                """A universal event handler for every single widget."""
-                if event_id in state.EVENT_REGISTRY:
-                    # If the widget sent data (like text or a slider value), pass it to Python
-                    if data is not None:
-                        state.EVENT_REGISTRY[event_id](data)
-                    else:
-                        state.EVENT_REGISTRY[event_id]() # Standard click with no data
+            # def trigger_event(self, event_id, params=None, data={}):
+            #     """A universal event handler for every single widget."""
+            #     if event_id in state.EVENT_REGISTRY:
+            #         cb = state.EVENT_REGISTRY[event_id]['callback']
+            #         state.EVENT_REGISTRY[event_id]['data'] = data
+            #         # If the widget sent data (like text or a slider value), pass it to Python
+            #         if cb:
+            #             if params is not None:
+            #                 cb(params)
+            #             else:
+            #                 cb() # Standard click with no data
+            def trigger(self, event_id, params=None, data=None):
+
+                # -------------------------
+                # 1. FUTURE RESOLVE (async get_info)
+                # -------------------------
+                if data and "req_id" in data:
+                    req_id = data["req_id"]
+
+                    future = state._FUTURES.get(req_id)
+                    if future:
+                        future["value"] = data
+                        future["done"] = True
+
+                # -------------------------
+                # 2. DEBOUNCE EVENT (STOP DOUBLE FIRING)
+                # -------------------------
+                now = time.time()
+                last = state._LAST_EVENT_TIME.get(event_id, 0)
+
+                if now - last < 0.05:   # 50ms protection
+                    return
+
+                state._LAST_EVENT_TIME[event_id] = now
+
+                # -------------------------
+                # 3. RUN CALLBACK
+                # -------------------------
+                cb = state.EVENT_HANDLERS.get(event_id)
+
+                if cb:
+                    try:
+                        if params is not None and data is not None:
+                            cb(params, data)
+                        elif params is not None:
+                            cb(params)
+                        elif data is not None:
+                            cb(data)
+                        else:
+                            cb()
+                    except Exception as e:
+                        print("Callback error:", e)
 
         self.window = webview.create_window(
             title=self.title,
@@ -96,10 +140,7 @@ class App:
             comp.render()
         
         # 🔥 execute queued JS
-        # for js in self._pending_js:
-        #     self.window.evaluate_js(js)
-
-        # self._pending_js.clear()
+       
         for js in state._PENDING_JS:
             self.window.evaluate_js(js)
 

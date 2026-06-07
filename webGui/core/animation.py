@@ -1,3 +1,4 @@
+from webGui.config import state
 class Animation:
     def __init__(self, app, name, keyframes, duration="1s", timing="ease", iteration="1"):
         self.app = app
@@ -26,7 +27,7 @@ class Animation:
         if self.app.window:
             self.app.window.evaluate_js(js)
         else:
-            self.app._pending_js.append(js)
+            state._PENDING_JS.append(js)
 
     # -----------------------------
     # Apply animation to widget
@@ -44,4 +45,4 @@ class Animation:
         if self.app.window:
             self.app.window.evaluate_js(js)
         else:
-            self.app._pending_js.append(js)
+            state._PENDING_JS.append(js)

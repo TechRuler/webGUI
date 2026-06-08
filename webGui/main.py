@@ -1,6 +1,8 @@
 
 import webview, time
 from webGui.config import state, settings
+import json
+import os
 
 class App:
     def __init__(self, title="App", width=800, height=60):
@@ -9,7 +11,73 @@ class App:
         self.window = None
         self.width = width 
         self.height = height
+    
+    def load_style(self, path: str):
+        """
+        Parses external .css or .json files and instantly routes them 
+        to the appropriate internal injection pipeline.
+        """
+        if not isinstance(path, str):
+            return 
+            
+        if not os.path.exists(path):
+            print(f"[Error]: File not found at {path}")
+            return
 
+        if path.endswith(".css"):
+            with open(path, 'r', encoding='utf-8') as f:
+                css_content = f.read()
+            # Pass raw string data to the style sheet injector
+            self._apply_css_stylesheet(css_content)
+            
+        elif path.endswith(".json"):
+            with open(path, 'r', encoding='utf-8') as f:
+                json_data = json.load(f)
+            # Pass dictionary to global style mapping tool
+            self._apply_json_theme(json_data)
+            
+        else:
+            print(f'[Error]: {path} format not supported. Only .json or .css files are allowed.')
+
+    def _apply_css_stylesheet(self, content: str):
+        """Injects a global CSS style sheet directly into the document header."""
+        # Clean up line breaks and escape backticks for safe JS execution
+        safe_content = content.replace("`", "\\`").replace("\r", "")
+        
+        js_script = f"""
+        (function() {{
+            let themeStyle = document.getElementById('global_framework_stylesheet');
+            if (!themeStyle) {{
+                themeStyle = document.createElement('style');
+                themeStyle.id = 'global_framework_stylesheet';
+                document.head.appendChild(themeStyle);
+            }}
+            themeStyle.innerHTML += `{safe_content}`;
+        }})();
+        """
+        
+        # Safe lifecycle execution routing
+        if self.window:
+            self.window.evaluate_js(js_script)
+        else:
+            from webGui.config import state
+            state._PENDING_JS.append(js_script)
+
+    def _apply_json_theme(self, theme_dict: dict):
+        """
+        Maps global JSON style tokens onto matching component class selectors 
+        or saves them into a framework styling lookup state.
+        """
+        # Option A: Save it as a structural design blueprint variable on your app
+        self.theme_tokens = theme_dict
+        
+        # Option B: If the JSON contains target classes (e.g., {"entry": {"backgroundColor": "red"}}),
+        # you can iterate through existing pre-rendered component arrays right here!
+        for component in self.components:
+            cls = getattr(component, "class_name", None)
+            if cls in theme_dict:
+                for property_name, value in theme_dict[cls].items():
+                    component.update_style(property_name, value)
         
     def add(self, component):
         self.components.append(component)
@@ -58,7 +126,7 @@ class App:
     # =====================================================================
     # LIFECYCLE MANAGEMENT
     # =====================================================================
-    def run(self):
+    def run(self, **kwargs):
         # The base HTML is just an empty canvas with pywebview's API bridge ready
         base_html = settings.BASE_HTML
         
@@ -129,7 +197,7 @@ class App:
         state.ACTIVE_WINDOW = self.window
         
         # Once the window loads, render all components that the user added
-        webview.start(self._on_loaded)
+        webview.start(self._on_loaded, **kwargs)
     
     def _on_loaded(self):
         self._initial_render()

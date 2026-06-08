@@ -9,15 +9,15 @@ class Button(BaseWidget):
 
         # Default button layout styles
         default_style = {
-            "backgroundColor": button_bg,
-            "color": "white",
-            "padding": "10px 20px",
-            "border": "none",
-            "borderRadius": "6px",
-            "cursor": "pointer",
-            "width": "max-content", 
-            "fontSize": "16px",
-            "transition": "filter 0.2s" # Enables smooth brightness transitions on hover
+            # "backgroundColor": button_bg,
+            # "color": "white",
+            # "padding": "10px 20px",
+            # "border": "none",
+            # "borderRadius": "6px",
+            # "cursor": "pointer",
+            # "width": "max-content", 
+            # "fontSize": "16px",
+            # "transition": "filter 0.2s" # Enables smooth brightness transitions on hover
         }
         super().__init__(
             prefix="btn",

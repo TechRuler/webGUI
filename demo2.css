@@ -1,0 +1,9 @@
+.code {
+    background-color: red;
+    color: blue;
+    padding: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 26px;
+    width: max-content;
+    border:none
+}

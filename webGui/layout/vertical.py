@@ -1,5 +1,5 @@
 import json
-from webGui.widgets.base import BaseWidget
+from webGui.core.base import BaseWidget
 
 
 class VerticalDiv(BaseWidget):

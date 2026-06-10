@@ -1,9 +1,9 @@
-.code {
-    background-color: red;
-    color: blue;
-    padding: 20px;
-    font-family: 'Courier New', Courier, monospace;
+.text {
+    background-color: slateblue;
+    color: aliceblue;
+    font-family: 'Fira Code', consolas, sans-serif;
     font-size: 26px;
-    width: max-content;
-    border:none
+    padding: 5px;
+    width: 100%;
+    height: 100%;
 }

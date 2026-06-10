@@ -1,0 +1,68 @@
+CONTAINER_TAGS = {
+    "div",
+    "span",
+    "section",
+    "article",
+    "header",
+    "footer",
+    "main",
+    "nav",
+    "aside",
+
+    "form",
+    "label",
+    "button",
+    "fieldset",
+
+    "ul",
+    "ol",
+    "li",
+
+    "table",
+    "thead",
+    "tbody",
+    "tfoot",
+    "tr",
+    "td",
+    "th",
+
+    "a",
+
+    "p",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+
+    "strong",
+    "b",
+    "i",
+    "em",
+    "small",
+    "code",
+    "pre",
+
+    "canvas",
+    "svg",
+}
+
+NON_CONTAINER_TAGS = {
+    "input",
+    "img",
+    "br",
+    "hr",
+
+    "meta",
+    "link",
+
+    "source",
+    "track",
+
+    "area",
+    "col",
+    "embed",
+    "param",
+    "wbr",
+}

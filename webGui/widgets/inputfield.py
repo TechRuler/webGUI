@@ -1,4 +1,4 @@
-from webGui.widgets.base import BaseWidget
+from webGui.core.base import BaseWidget
 import json 
 
 class InputField(BaseWidget):

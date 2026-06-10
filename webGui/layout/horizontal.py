@@ -1,5 +1,5 @@
 import json
-from webGui.widgets.base import BaseWidget
+from webGui.core.base import BaseWidget
 
 class HorizontalDiv(BaseWidget):
     """A layout container that aligns its children horizontally using Flexbox."""

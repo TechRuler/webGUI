@@ -102,11 +102,10 @@ master_stack = VerticalDiv(alignment="center", gap="25px", padding="30px")
 title_text = Label("Select an Application Theme Profile Below", style={"fontSize": "20px", "fontWeight": "bold"})
 theme_bar = HorizontalDiv(gap="15px", backgroundColor="#dcdde1", padding="20px", borderRadius="8px")
 
-
 # Instantiate control buttons
-btn_dark = Button("Go Dark", bg_color="#2c3e50", on_click=apply_dark_mode)
-btn_light = Button("Go Light", bg_color="#dcdde1", on_click=apply_light_mode)
-btn_matrix = Button("Go Matrix", bg_color="#4cd137", on_click=apply_matrix_mode)
+btn_dark = Button("Go Dark", backgroundColor="#2c3e50",color="white",padding="10px 20px",border="none",borderRadius="6px",cursor="pointer",width="max-content",fontSize="16px",trainsition="filter 0.2s", on_click=apply_dark_mode)
+btn_light = Button("Go Light", backgroundColor="#dcdde1",color="white",padding="10px 20px",border="none",borderRadius="6px",cursor="pointer",width="max-content",fontSize="16px",trainsition="filter 0.2s", on_click=apply_light_mode)
+btn_matrix = Button("Go Matrix", backgroundColor="#4cd137",color="white",padding="10px 20px",border="none",borderRadius="6px",cursor="pointer",width="max-content",fontSize="16px",trainsition="filter 0.2s", on_click=apply_matrix_mode)
 
 # Add elements manually to build the node tree hierarchy
 theme_bar.add(btn_dark)
@@ -115,7 +114,14 @@ theme_bar.add(btn_matrix)
 
 master_stack.add(title_text)
 master_stack.add(theme_bar)
+btn = Button(text='get')
+def func():
+    btn_dark.update_style('backgroundColor','red')
+    print(btn.style)
+
 
 # Boot up the window application pipeline
 app.add(master_stack)
+
+app.add(btn)
 app.run()

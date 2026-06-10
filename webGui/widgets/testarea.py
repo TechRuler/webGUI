@@ -1,5 +1,5 @@
 import json 
-from webGui.widgets.base import BaseWidget
+from webGui.core.base import BaseWidget
 
 class TextArea(BaseWidget):
     def __init__(self, class_name="", style=None, **kwargs):

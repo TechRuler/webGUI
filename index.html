@@ -8,16 +8,6 @@
 <body style="background-color: black;">
     <div></div>
     <input type="text">
-    <script>
-        const el = document.querySelector("input");
-        const dict = {}
-        for (let key in el) {
-            if (typeof el[key] !== "function") {
-                // console.log(key, el[key]);
-                dict[key] = el[key];
-            }
-        }
-        console.log(dict)
-    </script>
+    
 </body>
 </html>

@@ -1,48 +1,81 @@
-from webGui.core.base import BaseWidget
-import json 
+from webGui.html.tags import Input
 
-class InputField(BaseWidget):
-    def __init__(self, placeholder="", value="", on_change=None, style=None, **kwargs):
-        default_style = {
-            "width":"max-width"
-        }
-        super().__init__(prefix="input", on_event=on_change, event_suffix="change", style=style, default_style=default_style, **kwargs)
-        self.placeholder = placeholder
-        self.value = value
-        
+class TextInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'text'
+        super().__init__(attrs=attrs, style=style, **kwargs)
 
-    def render(self):
-        window = self.get_window()
-        if not window: return
 
-        style_json = json.dumps(self.style)
-        parent_target = getattr(self, '_target_parent_id', 'root')
+class PasswordInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'password'
+        super().__init__(attrs=attrs, style=style, **kwargs)
 
-        js_script = f"""
-        (function(){{
-            let input = document.createElement('input');
-            input.id = '{self.id}';
 
-            const cls = '{self.class_name}';
+class EmailInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'email'
+        super().__init__(attrs=attrs, style=style, **kwargs)
 
-            if (cls && cls.trim()){{
-                input.classList.add(...cls.trim().split(/\\s+/));
-            }}
 
-            input.type = 'text';
-            input.value = '{self.value}';
-            input.placeholder = '{self.placeholder}'
-            Object.assign(input.style, {style_json});
+class NumberInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'number'
+        super().__init__(attrs=attrs, style=style, **kwargs)
 
-            let targetNode = document.getElementById('{parent_target}');
-            if (targetNode) {{
-                targetNode.appendChild(input);
-            }} else {{
-                console.error("Framework Error: Target parent layout container element ID '{parent_target}' not found in DOM.");
-            }}
-            
-        }})();
-        """
 
-        window.evaluate_js(js_script)
-    
+class CheckboxInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'checkbox'
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class RadioInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'radio'
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class FileInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'file'
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class DateInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'date'
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class ColorInput(Input):
+    def __init__(self, attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs['type'] = 'color'
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class InputField(Input):
+    def __init__(self, input_type="text", attrs=None, style=None, **kwargs):
+        attrs = attrs or {}
+        attrs["type"] = input_type
+        super().__init__(attrs=attrs, style=style, **kwargs)
+
+
+class RangeInput(Input):
+    def __init__(self, attrs={}, min=0, max=100, step=1, **kwargs):
+       
+        attrs["type"] = "range"
+        attrs["min"] = str(min)
+        attrs["max"] = str(max)
+        attrs["step"] = str(step)
+
+        super().__init__(attrs=attrs, **kwargs)

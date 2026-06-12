@@ -10,31 +10,30 @@ class BaseWidget(
     StyleMixin
 ):
     def __init__(self, prefix="widget", on_event=None, event_suffix="action", class_name="", style=None, default_style=None, **kwargs):
-        # 1. Automatically generate a clean, unique ID for every single widget
+        # Automatically generate a clean, unique ID for every single widget
         self.id = f"{prefix}_{uuid.uuid4().hex[:8]}"
         self.app = None
         self.class_name = class_name
+        self._rendered = False
+        self._pending_ops = []
 
         self.style = self.clean_style(style, kwargs, default_style)
         
         # Default target parent is the main canvas root
         self._target_parent_id = "root"
         
-        # 2. CONTEXT MANAGEMENT: Auto-detect if inside a layout 'with' block
+        # CONTEXT MANAGEMENT: Auto-detect if inside a layout 'with' block
         if hasattr(state, 'LAYOUT_STACK') and state.LAYOUT_STACK:
             active_container = state.LAYOUT_STACK[-1]
             self._target_parent_id = active_container.id
             active_container.children.append(self)
 
-        # 3. Automatically handle event registration for any widget type
+        # Automatically handle event registration for any widget type
         if on_event:
             event_key = f"{self.id}_{event_suffix}"
-            # state.EVENT_REGISTRY[event_key] = {
-            #     'data':{},
-            #     'callback':on_event
-            # }
+           
             state.EVENT_HANDLERS[event_key] = on_event
-            # state.EVENT_DATA[event_key] = {}
+            
 
     
     
@@ -50,10 +49,27 @@ class BaseWidget(
         window = self.get_window()
 
         if window:
-            window.evaluate_js(js)
-        else:
-            state._PENDING_JS.append(js)
+            return window.evaluate_js(js)
+
+        state._PENDING_JS.append(js)
+        return None
     
+    def _run_dom_js(self, js):
+        if not self._rendered:
+            self._pending_ops.append(js)
+            return None
+
+        return self._execute_js(js)
+
+    def _mark_rendered(self):
+        self._rendered = True
+
+        if self._pending_ops:
+            for js in self._pending_ops:
+                self._execute_js(js)
+
+            self._pending_ops.clear()
+
     def get_config(self, property_name):
         """
         Safe getter for:
@@ -92,18 +108,7 @@ class BaseWidget(
             self.render()
         self._target_parent_id = "root" # Reset fallback
     
-    def get_class_name(self):
-        return self.class_name
     
-    def get_id(self):
-        return self.id
-    
-   
-    
-    
-    
-    
-
     def get_info_from_js(self, event_id, req_id):
         window = self.get_window()
         if not window:
@@ -175,7 +180,7 @@ class BaseWidget(
 
     
         
-    # 4. CONTEXT SCOPE HOOKS (Enables the 'with' statement for containers)
+    # CONTEXT SCOPE HOOKS (Enables the 'with' statement for containers)
     def __enter__(self):
         if not hasattr(state, 'LAYOUT_STACK'):
             state.LAYOUT_STACK = []

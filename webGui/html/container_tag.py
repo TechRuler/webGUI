@@ -3,7 +3,7 @@ from webGui.core.base import BaseWidget
 from webGui.config import state
 
 class ContainerTag(BaseWidget):
-    def __init__(self, tag="", attrs={}, children=None, class_name="", style=None, **kwargs):
+    def __init__(self, tag="", on_event=None, event_suffix="action", attrs={}, children=None, class_name="", style=None, **kwargs):
         self.children = children or []
 
         
@@ -12,6 +12,8 @@ class ContainerTag(BaseWidget):
             prefix=tag,
             style=style,
             class_name=class_name,
+            on_event=on_event, 
+            event_suffix=event_suffix,
             **kwargs
         )
 
@@ -62,6 +64,8 @@ class ContainerTag(BaseWidget):
         """
 
         window.evaluate_js(js)
+
+        self._mark_rendered()
 
         for child in self.children:
             child.app = self.app

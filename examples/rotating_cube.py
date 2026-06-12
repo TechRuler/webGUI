@@ -1,5 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from webGui import App
-from webGui.layout import Div
+from webGui.widgets import Frame
 from webGui.core import Animation
 
 # 1. Canvas Frame Initialization
@@ -21,7 +25,7 @@ rotate_3d = Animation(
 rotate_3d.register()
 
 # 3. Perspective Stage Container Block (This makes the 3D depth work!)
-stage = Div(style={
+stage = Frame(style={
     "position": "absolute",
     "top": "50%",
     "left": "50%",
@@ -37,14 +41,14 @@ root.add(stage)
 
 # 4. The Main Cube Core Node
 with stage:
-    cube = Div(style={
+    cube = Frame(style={
         "position": "relative",
         "width": "200px",
         "height": "200px",
         "transformStyle": "preserve-3d", # CRITICAL: Keeps child faces inside 3D environment space
     })
 
-# 5. Define the individual transforms and colors for the 6 faces
+# 5. Define the inFrameidual transforms and colors for the 6 faces
 # Every face shifts out by exactly half the cube's width (100px) from the center origin
 face_configs = [
     {"transform": "rotateY(0deg) translateZ(100px)",   "bg": "rgba(231, 76, 60, 0.7)",  "border": "#e74c3c"},  # Front
@@ -58,7 +62,7 @@ face_configs = [
 # 6. Build the Faces Inside the Cube Block Architecture context
 with cube:
     for config in face_configs:
-        Div(style={
+        Frame(style={
             "position": "absolute",
             "width": "200px",
             "height": "200px",

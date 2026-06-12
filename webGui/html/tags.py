@@ -1,6 +1,17 @@
 from webGui.html.container_tag import ContainerTag
 from webGui.html.void_tag import VoidTag
 
+class Textarea(ContainerTag):
+    def __init__(self, attrs=None, children=None, class_name="", style=None, **kwargs):
+        super().__init__(
+            tag="textarea",
+            attrs=attrs,
+            children=children,
+            class_name=class_name,
+            style=style,
+            **kwargs
+        )
+
 class Div(ContainerTag):
     def __init__(self, attrs=None, children=None, class_name="", style=None, **kwargs):
         super().__init__(

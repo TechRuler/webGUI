@@ -53,3 +53,5 @@ class VoidTag(BaseWidget):
         """
 
         window.evaluate_js(js)
+
+        self._mark_rendered()

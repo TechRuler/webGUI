@@ -37,13 +37,10 @@ class StyleMixin:
 
         return result
 
-    def update_style(self, property_name, value, sub_id=None):
+    def update_style(self, property_name, value):
         """A universal method allowing users to change ANY CSS property on the fly!"""
         self.style[property_name] = value
         window = self.get_window()
-        element_id = self.id if sub_id is None else sub_id
-        print(element_id)
         if window:
-            # e.g., document.getElementById('btn_123').style.backgroundColor = 'red';
-            js_update = f"document.getElementById('{element_id}').style.{property_name} = '{value}';"
+            js_update = f"document.getElementById('{self.id}').style.{property_name} = '{value}';"
             window.evaluate_js(js_update)

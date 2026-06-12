@@ -1,5 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from webGui import App
-from webGui.layout import Div
+from webGui.widgets import Frame
 from webGui.core import Animation
 
 # 1. Canvas and Background setup
@@ -42,7 +46,7 @@ nucleus_pulse.register()
 # 3. CONSTRUCT THE ATOMIC TREE
 # =====================================================================
 # Main 3D Container Stage
-atom_stage = Div(style={
+atom_stage = Frame(style={
     "position": "absolute",
     "top": "50%",
     "left": "50%",
@@ -55,7 +59,7 @@ root.add(atom_stage)
 
 with atom_stage:
     # ⚛️ THE NUCLEUS (Central Energy Core)
-    nucleus = Div(style={
+    nucleus = Frame(style={
         "position": "absolute",
         "top": "50%",
         "left": "50%",
@@ -79,7 +83,7 @@ with atom_stage:
 
     for orbit in orbit_planes:
         # Create a tilted 3D container for the orbit
-        orbit_container = Div(style={
+        orbit_container = Frame(style={
             "position": "absolute",
             "top": "0",
             "left": "0",
@@ -92,7 +96,7 @@ with atom_stage:
         
         with orbit_container:
             # The physical visual ring track that will spin
-            ring_track = Div(style={
+            ring_track = Frame(style={
                 "position": "absolute",
                 "top": "10%",
                 "left": "10%",
@@ -105,7 +109,7 @@ with atom_stage:
             
             with ring_track:
                 # Place the glowing electron particle onto the perimeter of the track
-                Div(style={
+                Frame(style={
                     "position": "absolute",
                     "top": "50%",
                     "left": "100%", # Positioned precisely on the far outer border edge

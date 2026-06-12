@@ -1,5 +1,9 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from webGui import App
-from webGui.layout import Div
+from webGui.widgets import Frame
 from webGui.core import Animation
 
 # 1. Canvas Frame Initialization
@@ -32,7 +36,7 @@ for planet, speed in orbit_speeds.items():
 # 3. BUILD THE STRUCTURE LAYOUT
 # =====================================================================
 # Main Space Canvas Centering Frame Anchor
-space_canvas = Div(style={
+space_canvas = Frame(style={
     "position": "absolute",
     "top": "50%",
     "left": "50%",
@@ -45,7 +49,7 @@ root.add(space_canvas)
 with space_canvas:
     # 🌟 THE CENTRAL SUN
     # It sits perfectly centered using transform positions
-    sun = Div(style={
+    sun = Frame(style={
         "position": "absolute",
         "top": "50%",
         "left": "50%",
@@ -72,7 +76,7 @@ with space_canvas:
     # Dynamically inject the planet nodes inside the space canvas container context
     for p in planet_matrix:
         # Create the rotating orbit wrapper boundary ring line
-        orbit_ring = Div(style={
+        orbit_ring = Frame(style={
             "position": "absolute",
             "top": "50%",
             "left": "50%",
@@ -86,7 +90,7 @@ with space_canvas:
         
         # Place the physical planet body right onto its parent orbit container edge
         with orbit_ring:
-            Div(style={
+            Frame(style={
                 "position": "absolute",
                 "top": "50%",
                 "left": "100%", # Pulls it straight out to the far right perimeter boundary edge

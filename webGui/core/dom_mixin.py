@@ -4,6 +4,10 @@ class DOMMixin:
 
     _css_rules = {}
 
+    @property
+    def dom(self) -> "DOMMixin":
+        return self
+
     def _el(self):
         return f"document.getElementById('{self.id}')"
     

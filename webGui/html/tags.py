@@ -12,6 +12,26 @@ class Textarea(ContainerTag):
             **kwargs
         )
 
+class Select(ContainerTag):
+    def __init__(self, attrs=None, children=None, class_name="", style=None, **kwargs):
+        super().__init__(
+            tag="select",
+            attrs=attrs,
+            children=children,
+            class_name=class_name,
+            style=style,
+            **kwargs
+        )
+class Option(ContainerTag):
+    def __init__(self, attrs=None, children=None, class_name="", style=None, **kwargs):
+        super().__init__(
+            tag="option",
+            attrs=attrs,
+            children=children,
+            class_name=class_name,
+            style=style,
+            **kwargs
+        )
 class Div(ContainerTag):
     def __init__(self, attrs=None, children=None, class_name="", style=None, **kwargs):
         super().__init__(

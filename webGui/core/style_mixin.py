@@ -1,3 +1,4 @@
+import json
 class StyleMixin:
 
     def _normalize_styles(self, style):
@@ -42,5 +43,14 @@ class StyleMixin:
         self.style[property_name] = value
         window = self.get_window()
         if window:
-            js_update = f"document.getElementById('{self.id}').style.{property_name} = '{value}';"
+            
+            # js_update = f"document.getElementById('{self.id}').style.{property_name} = '{value}';"
+            js_update = f"""
+            (() => {{
+                const el = document.getElementById({json.dumps(self.id)});
+                if (el) {{
+                    el.style[{json.dumps(property_name)}] = {json.dumps(value)};
+                }}
+            }})();
+            """
             window.evaluate_js(js_update)

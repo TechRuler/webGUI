@@ -2,35 +2,59 @@ import json
 _SENTINEL = object()
 class DOMMixin:
 
+    _css_rules = {}
+
     def _el(self):
         return f"document.getElementById('{self.id}')"
     
-
     def _property(self, name, value=_SENTINEL):
         if value is not _SENTINEL:
             self._run_dom_js(
                 f"{self._el()}.{name} = {json.dumps(value)};"
             )
             return self
-
+        
         return self._run_dom_js(
             f"{self._el()}.{name};"
         )
+    
     def add_css_rule(self, selector, styles):
-        css = f"{selector} {{\n"
+        self._css_rules[selector] = styles
 
-        for key, value in styles.items():
-            css += f"    {key}: {value};\n"
+        css = []
 
-        css += "}"
+        for selector, styles in self._css_rules.items():
+            css.append(f"{selector} {{")
+
+            for key, value in styles.items():
+                if key == "content":
+                    value = f'"{value}"'
+
+                css.append(f"    {key}: {value};")
+
+            css.append("}")
+
+        css_text = "\n".join(css)
 
         self._run_dom_js(f"""
-        (function(){{
-            let style = document.createElement('style');
-            style.textContent = {json.dumps(css)};
-            document.head.appendChild(style);
+        (() => {{
+            let style = document.getElementById("dommixin-styles");
+
+            if (!style) {{
+                style = document.createElement("style");
+                style.id = "dommixin-styles";
+                document.head.appendChild(style);
+            }}
+
+            style.textContent = {json.dumps(css_text)};
         }})();
         """)
+
+        return self
+
+    def pseudo(self, selector, css):
+        self.add_css_rule(f"#{self.id}{selector}", css)
+        return self
 
     def innerText(self, text=_SENTINEL):
         return self._property("innerText", text)
@@ -82,6 +106,17 @@ class DOMMixin:
 
     def tabIndex(self, value=_SENTINEL):
         return self._property("tabIndex", value)
+    
+    def store_data(self, name:str, value=_SENTINEL):
+        if value is not _SENTINEL:
+            self._run_dom_js(
+                f"{self._el()}.dataset[{json.dumps(name)}] = {json.dumps(value)};"
+            )
+            return self
+
+        return self._run_dom_js(
+            f"{self._el()}.dataset[{json.dumps(name)}];"
+        )
     def remove(self):
         self._run_dom_js(
             f"{self._el()}.remove();"
@@ -176,6 +211,24 @@ class DOMMixin:
             """
         )
         return self
+    def set_styles(self, css):
+        js = []
+
+        for k, v in css.items():
+            js.append(
+                f"el.style[{json.dumps(k)}] = {json.dumps(v)};"
+            )
+
+        self._run_dom_js(f"""
+        (() => {{
+            const el = {self._el()};
+            if (el) {{
+                {" ".join(js)}
+            }}
+        }})();
+        """)
+
+        return self
     def get_style(self, key: str):
         return self._run_dom_js(
             f"getComputedStyle({self._el()})[{json.dumps(key)}];"
@@ -201,12 +254,16 @@ class DOMMixin:
         return self
     
     def before(self, css):
-        selector = f"#{self.id}::before"
-        self.add_css_rule(selector, css)
-        return self
+        return self.pseudo("::before", css)
 
     def after(self, css):
-        selector = f"#{self.id}::after"
-        self.add_css_rule(selector, css)
-        return self
-    
+        return self.pseudo("::after", css)
+
+    def focus_css(self, css):
+        return self.pseudo(":focus", css)
+
+    def hover_css(self, css):
+        return self.pseudo(":hover", css)
+
+    def active_css(self, css):
+        return self.pseudo(":active", css)

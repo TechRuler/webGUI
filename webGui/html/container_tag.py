@@ -6,7 +6,7 @@ class ContainerTag(BaseWidget):
     def __init__(self, tag="", on_event=None, event_suffix="action", attrs={}, children=None, class_name="", style=None, **kwargs):
         self.children = children or []
 
-        
+        default_style = kwargs.pop('default_style', None)
 
         super().__init__(
             prefix=tag,
@@ -14,6 +14,7 @@ class ContainerTag(BaseWidget):
             class_name=class_name,
             on_event=on_event, 
             event_suffix=event_suffix,
+            default_style=default_style,
             **kwargs
         )
 
@@ -49,7 +50,7 @@ class ContainerTag(BaseWidget):
             let element = document.createElement('{self.tag}');
             element.id = '{self.id}';
 
-            const cls = '{json.dumps(self.class_name)}';
+            const cls = {json.dumps(self.class_name)};
             if (cls && cls.trim()) {{
                 element.classList.add(...cls.trim().split(/\\s+/));
             }}

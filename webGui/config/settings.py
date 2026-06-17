@@ -46,7 +46,7 @@ BASE_HTML = f"""
     </style>
 </head>
 <body>
-    
+    <div class="menu-bar"></div>
     <div id="root"></div>
 </body>
 </html>

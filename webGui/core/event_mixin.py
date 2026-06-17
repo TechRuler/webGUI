@@ -3,6 +3,12 @@ from webGui.config import state
 class EventMixin:
 
     def register_event(self, event_type):
+        key = f"{self.id}_{event_type}"
+        if key in state.BOUND_EVENTS:
+            return
+
+        state.BOUND_EVENTS.add(key)
+
         js = f"""
         (function() {{
             let el = document.getElementById({json.dumps(self.id)});
@@ -11,7 +17,7 @@ class EventMixin:
             el.addEventListener({json.dumps(event_type)}, () => {{
                 if (window.pywebview?.api?.trigger) {{
                     window.pywebview.api.trigger(
-                        {json.dumps(f"{self.id}_{event_type}")}
+                        {json.dumps(key)}
                     );
                 }}
             }});

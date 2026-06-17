@@ -12,6 +12,11 @@ class App:
         self.width = width 
         self.height = height
     
+    def Menu(self, label, menu):
+        return webview.menu.Menu(label,menu)
+    def MenuAction(self, label, func):
+        return webview.menu.MenuAction(label, func)
+    
     def load_style(self, path: str):
         """
         Parses external .css or .json files and instantly routes them 
@@ -209,10 +214,15 @@ class App:
         
         # 🔥 execute queued JS
        
-        for js in state._PENDING_JS:
-            self.window.evaluate_js(js)
+        # for js in state._PENDING_JS:
+        #     self.window.evaluate_js(js)
 
-        state._PENDING_JS.clear()
+        # state._PENDING_JS.clear()
+        if state._PENDING_JS:
+            self.window.evaluate_js(
+                "\n".join(state._PENDING_JS)
+            )
+            state._PENDING_JS.clear()
 
          # small delay ensures JS runtime is ready
         self.window.evaluate_js("""

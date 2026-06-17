@@ -2,57 +2,115 @@
 <html>
 <head>
 <style>
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
+body {
+    font-family: Arial, sans-serif;
+    background: #1e1e1e;
+    color: white;
+    padding: 20px;
 }
 
-.switch input {
+.tree {
+    user-select: none;
+}
+
+.tree-node {
+    margin-left: 20px;
+}
+
+.tree-header {
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.tree-header:hover {
+    background: #333;
+}
+
+.tree-children {
+    margin-left: 20px;
     display: none;
 }
 
-.slider {
-    position: absolute;
-    cursor: pointer;
-    inset: 0;
-    background-color: #ccc;
-    transition: 0.3s;
-    border-radius: 34px;
-}
-
-.slider::before {
-    content: "";
-    position: absolute;
-    width: 26px;
-    height: 26px;
-    left: 4px;
-    bottom: 4px;
-    background: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider::before {
-    transform: translateX(26px);
+.arrow {
+    display: inline-block;
+    width: 16px;
 }
 </style>
 </head>
 <body>
 
-<label class="switch">
-    <input type="checkbox" id="toggle">
-    <span class="slider"></span>
-</label>
+<div class="tree">
+
+    <div class="tree-node">
+
+        <div class="tree-header">
+            <span class="arrow">▶</span>
+            📁 Project
+        </div>
+
+        <div class="tree-children">
+
+            <div class="tree-node">
+
+                <div class="tree-header">
+                    <span class="arrow">▶</span>
+                    📁 src
+                </div>
+
+                <div class="tree-children">
+
+                    <div class="tree-node">
+                        <div class="tree-header">
+                            📄 main.py
+                        </div>
+                    </div>
+
+                    <div class="tree-node">
+                        <div class="tree-header">
+                            📄 utils.py
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="tree-node">
+                <div class="tree-header">
+                    📄 README.md
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 <script>
-document.getElementById("toggle").addEventListener("change", function() {
-    console.log("Switch:", this.checked);
+document.querySelectorAll(".tree-header").forEach(header => {
+
+    header.addEventListener("click", () => {
+
+        const children =
+            header.parentElement.querySelector(":scope > .tree-children");
+
+        if (!children) return;
+
+        const arrow =
+            header.querySelector(".arrow");
+
+        if (children.style.display === "block") {
+            children.style.display = "none";
+            arrow.textContent = "▶";
+        } else {
+            children.style.display = "block";
+            arrow.textContent = "▼";
+        }
+
+    });
+
 });
 </script>
 

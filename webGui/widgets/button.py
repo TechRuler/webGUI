@@ -1,7 +1,7 @@
-from webGui.html import tags 
+from webGui.html.tags import Button as button
 from webGui.config import state
 
-class Button(tags.Button):
+class Button(button):
     def __init__(self, text='', on_click=None, style=None, **kwargs):
 
         super().__init__(style=style, **kwargs)

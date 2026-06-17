@@ -11,10 +11,12 @@ class VoidTag(BaseWidget):
         style=None,
         **kwargs
     ):
+        default_style = kwargs.pop('default_style', None)
         super().__init__(
             prefix=tag,
             style=style,
             class_name=class_name,
+            default_style=default_style,
             **kwargs
         )
 

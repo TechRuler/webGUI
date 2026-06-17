@@ -1,117 +1,37 @@
-from webGui.core.base import BaseWidget
-import json
+from webGui.config import state
 
-class Menu(BaseWidget):
-    def __init__(self, class_name="", style=None, **kwargs):
-        super().__init__(
-            prefix="menu",
-            on_event=None,
-            event_suffix="select",
-            class_name=class_name,
-            style=style,
-            **kwargs
-        )
+class Menu:
+    def __init__(self, app):
+        self.app = app
+    
+    def get_window(self):
+        """Helper to safely fetch the active window from context or parent app."""
+        if self.app and self.app.window:
+            return self.app.window
+        if hasattr(state, 'ACTIVE_WINDOW') and state.ACTIVE_WINDOW:
+            return state.ACTIVE_WINDOW
+        return None
 
-        # menu structure
-        self.menus = {}
-
-    # -----------------------------
-    # Create top-level menu
-    # -----------------------------
-    def add_menu(self, label):
-        if label not in self.menus:
-            self.menus[label] = []
-
-    # -----------------------------
-    # Add item inside menu
-    # -----------------------------
-    def add_item(self, menu_label, item_label, function=None):
-        if menu_label not in self.menus:
-            self.menus[menu_label] = []
-
-        self.menus[menu_label].append((item_label, function))
-
-    # -----------------------------
-    # Render UI
-    # -----------------------------
-    def render(self):
+    def _execute_js(self, js):
         window = self.get_window()
-        if not window:
-            return
 
-        data = {
-            menu: [item[0] for item in items]
-            for menu, items in self.menus.items()
-        }
+        if window:
+            return window.evaluate_js(js)
 
-        style_json = json.dumps(self.style or {})
-        data_json = json.dumps(data)
-        parent_target = getattr(self, "_target_parent_id", "menubar")
+        state._PENDING_JS.append(js)
+        return None
+    
+    def __check_id(self, menu):
+        id = ""
+        if menu == self.app:
+            id = "menu-bar"
+        else:
+            id = menu.id 
+    def add_menu(self, menu):
+        pass
 
-        js = f"""
-        (function(){{
-            const bar = document.createElement("div");
-            bar.id = "{self.id}";
-            Object.assign(bar.style, {style_json});
+        
 
-            bar.style.display = "flex";
-            bar.style.gap = "15px";
-            bar.style.alignItems = "center";
-            bar.style.height = "100%";
 
-            const data = {data_json};
-
-            Object.keys(data).forEach(menuName => {{
-                const menu = document.createElement("div");
-                menu.innerText = menuName;
-                menu.style.position = "relative";
-                menu.style.cursor = "pointer";
-                menu.style.padding = "6px 10px";
-
-                const dropdown = document.createElement("div");
-                dropdown.style.position = "absolute";
-                dropdown.style.top = "100%";
-                dropdown.style.left = "0";
-                dropdown.style.background = "#2b2b2b";
-                dropdown.style.display = "none";
-                dropdown.style.flexDirection = "column";
-                dropdown.style.minWidth = "140px";
-                dropdown.style.zIndex = "9999";
-
-                data[menuName].forEach(item => {{
-                    const el = document.createElement("div");
-                    el.innerText = item;
-                    el.style.padding = "8px";
-                    el.style.cursor = "pointer";
-                    el.style.color = "white";
-
-                    el.onclick = () => {{
-                        window.pywebview.api.trigger_event(
-                            "{self.id}",
-                            "select",
-                            menuName + ":" + item
-                        );
-                    }};
-
-                    dropdown.appendChild(el);
-                }});
-
-                menu.appendChild(dropdown);
-
-                menu.onmouseenter = () => {{
-                    dropdown.style.display = "flex";
-                }};
-
-                menu.onmouseleave = () => {{
-                    dropdown.style.display = "none";
-                }};
-
-                bar.appendChild(menu);
-            }});
-
-            const parent = document.getElementById(menubar);
-            if (parent) parent.appendChild(bar);
-        }})();
-        """
-
-        window.evaluate_js(js)
+    
+        
